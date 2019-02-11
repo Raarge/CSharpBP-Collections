@@ -1,10 +1,5 @@
-﻿using Acme.Common;
-using static Acme.Common.LoggingService;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using Acme.Common;
 
 namespace Acme.Biz
 {
@@ -108,8 +103,28 @@ namespace Acme.Biz
         /// </summary>
         /// <param name="markupPercent">Percent used to mark up the cost.</param>
         /// <returns></returns>
-        public decimal CalculateSuggestedPrice(decimal markupPercent) =>
-             this.Cost + (this.Cost * markupPercent / 100);
+
+        // C# 6 method but has no guard methods instead we will revert back to old method  see below method
+        //public decimal CalculateSuggestedPrice(decimal markupPercent) =>
+        //     this.Cost + (this.Cost * markupPercent / 100);
+
+        public OperationResult<decimal> CalculateSuggestedPrice(decimal markupPercent)
+        {
+            var message = "";
+            if (markupPercent <= 0m)
+            {
+                message = "Invalid markup percentage";
+            }
+            else if (markupPercent < 10)
+            {
+                message = "Below recommended markup percentage";
+            }
+
+            var value = this.Cost + (this.Cost * markupPercent / 100);
+
+            var operationResult = new OperationResult<decimal>(value, message);
+            return operationResult;
+        }
 
         public override string ToString()
         {
